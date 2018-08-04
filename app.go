@@ -8,10 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"go-rest-framework/helpers/arrayHelper"
-	"go-rest-framework/helpers/mailHelper"
-
 	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/go-rest-framework/arrayHelper"
+	"github.com/go-rest-framework/mailHelper"
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
