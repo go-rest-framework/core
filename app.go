@@ -77,6 +77,7 @@ func (a *App) Protect(next func(w http.ResponseWriter, r *http.Request), roles [
 			w.Write([]byte("Error verifying JWT token: " + err.Error()))
 			return
 		}
+		id := claims.(jwt.MapClaims)["id"].(string)
 		name := claims.(jwt.MapClaims)["name"].(string)
 		role := claims.(jwt.MapClaims)["role"].(string)
 
@@ -86,6 +87,7 @@ func (a *App) Protect(next func(w http.ResponseWriter, r *http.Request), roles [
 			return
 		}
 
+		r.Header.Set("id", id)
 		r.Header.Set("name", name)
 		r.Header.Set("role", role)
 
@@ -94,8 +96,9 @@ func (a *App) Protect(next func(w http.ResponseWriter, r *http.Request), roles [
 	}
 }
 
-func (a *App) GenToken(login, role *string) (string, error) {
+func (a *App) GenToken(id, login, role *string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":   id,
 		"name": login,
 		"role": role,
 	})
