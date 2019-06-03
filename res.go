@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"io"
+	"strings"
 
 	"github.com/asaskevich/govalidator"
 )
@@ -10,13 +11,13 @@ import (
 type Errs []ErrorMsg
 
 type ErrorMsg struct {
-	Item string
-	Msg  string
+	Item string `json:"item"`
+	Msg  string `json:"msg"`
 }
 
 type Response struct {
-	Errors Errs
-	Data   interface{}
+	Errors Errs        `json:"errors"`
+	Data   interface{} `json:"data"`
 }
 
 func (e *Errs) Add(item string, msg string) {
@@ -47,7 +48,12 @@ func (r *Response) IsJsonParseDone(jsn io.Reader) bool {
 func (r *Response) IsValidate() bool {
 	_, err := govalidator.ValidateStruct(r.Data)
 	if err != nil {
-		r.Errors.Add("valid", err.Error())
+
+		t := strings.Split(err.Error(), ";")
+		for _, v := range t {
+			tt := strings.Split(v, ": ")
+			r.Errors.Add(tt[0], tt[1])
+		}
 		return false
 	}
 	return true
