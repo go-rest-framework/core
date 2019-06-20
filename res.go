@@ -3,6 +3,7 @@ package core
 import (
 	"encoding/json"
 	"io"
+	"net/http"
 	"strings"
 
 	"github.com/asaskevich/govalidator"
@@ -16,8 +17,9 @@ type ErrorMsg struct {
 }
 
 type Response struct {
-	Errors Errs        `json:"errors"`
-	Data   interface{} `json:"data"`
+	Errors Errs          `json:"errors"`
+	Data   interface{}   `json:"data"`
+	Req    *http.Request `json:"-"`
 }
 
 func (e *Errs) Add(item string, msg string) {
@@ -25,7 +27,7 @@ func (e *Errs) Add(item string, msg string) {
 }
 
 func (r *Response) Make() []byte {
-	if len(r.Errors) > 0 {
+	if len(r.Errors) > 0 || r.isCheckValidate() {
 		r.Data = nil
 	}
 	res, err := json.MarshalIndent(r, "", "  ")
@@ -56,5 +58,15 @@ func (r *Response) IsValidate() bool {
 		}
 		return false
 	}
+	if r.isCheckValidate() {
+		return false
+	}
 	return true
+}
+
+func (r *Response) isCheckValidate() bool {
+	if r.Req.Header.Get("isValidate") == "1" {
+		return true
+	}
+	return false
 }
