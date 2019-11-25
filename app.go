@@ -19,6 +19,7 @@ import (
 var TokenSigningKey []byte
 
 type Config struct {
+	Dbhost          string
 	Dbname          string
 	Dbuser          string
 	Dbpass          string
@@ -46,9 +47,10 @@ func (a *App) Init() {
 
 	TokenSigningKey = []byte(a.Config.TokenSigningKey)
 	connectstr := fmt.Sprintf(
-		"%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
+		"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
 		a.Config.Dbuser,
 		a.Config.Dbpass,
+		a.Config.Dbhost,
 		a.Config.Dbname,
 	)
 	db, err := gorm.Open("mysql", connectstr)
