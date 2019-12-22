@@ -82,10 +82,17 @@ func (a *App) Protect(next func(w http.ResponseWriter, r *http.Request), roles [
 		id := claims.(jwt.MapClaims)["id"].(string)
 		name := claims.(jwt.MapClaims)["name"].(string)
 		role := claims.(jwt.MapClaims)["role"].(string)
+		status := claims.(jwt.MapClaims)["status"].(string)
 
 		if !arrayHelper.Include(roles, role) {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Write([]byte("You are not allowed to perform this action.(" + role + ")"))
+			return
+		}
+
+		if status != "active" {
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte("Only active users can perform this action"))
 			return
 		}
 
@@ -98,11 +105,12 @@ func (a *App) Protect(next func(w http.ResponseWriter, r *http.Request), roles [
 	}
 }
 
-func (a *App) GenToken(id, login, role *string) (string, error) {
+func (a *App) GenToken(id, login, role *string, status *string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":   id,
-		"name": login,
-		"role": role,
+		"id":     id,
+		"name":   login,
+		"role":   role,
+		"status": status,
 	})
 	tokenString, err := token.SignedString(TokenSigningKey)
 	return tokenString, err
