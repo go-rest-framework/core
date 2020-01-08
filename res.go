@@ -19,6 +19,7 @@ type ErrorMsg struct {
 type Response struct {
 	Errors Errs          `json:"errors"`
 	Data   interface{}   `json:"data"`
+	Count  int           `json:"count"`
 	Req    *http.Request `json:"-"`
 }
 
