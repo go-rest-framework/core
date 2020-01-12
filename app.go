@@ -14,11 +14,13 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 var TokenSigningKey []byte
 
 type Config struct {
+	Dbtype          string
 	Dbhost          string
 	Dbname          string
 	Dbuser          string
@@ -37,7 +39,8 @@ type App struct {
 }
 
 func (a *App) Init() {
-
+	var db *gorm.DB
+	var err error
 	if len(os.Args) > 1 {
 		if os.Args[1] == "test" {
 			a.IsTest = true
@@ -46,16 +49,31 @@ func (a *App) Init() {
 	}
 
 	TokenSigningKey = []byte(a.Config.TokenSigningKey)
-	connectstr := fmt.Sprintf(
-		"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
-		a.Config.Dbuser,
-		a.Config.Dbpass,
-		a.Config.Dbhost,
-		a.Config.Dbname,
-	)
-	db, err := gorm.Open("mysql", connectstr)
-	if err != nil {
-		panic(err)
+	if a.Config.Dbtype == "mysql" {
+		connectstr := fmt.Sprintf(
+			"%s:%s@(%s)/%s?charset=utf8&parseTime=True&loc=Local",
+			a.Config.Dbuser,
+			a.Config.Dbpass,
+			a.Config.Dbhost,
+			a.Config.Dbname,
+		)
+		db, err = gorm.Open("mysql", connectstr)
+		if err != nil {
+			panic(err)
+		}
+	} else if a.Config.Dbtype == "postgres" {
+		connectstr := fmt.Sprintf(
+			"host=%s user=%s dbname=%s password=%s sslmode=disable",
+			a.Config.Dbhost,
+			a.Config.Dbuser,
+			a.Config.Dbname,
+			a.Config.Dbpass,
+		)
+
+		db, err = gorm.Open("postgres", connectstr)
+		if err != nil {
+			panic(err)
+		}
 	}
 	a.DB = db
 	a.R = mux.NewRouter().StrictSlash(false)
