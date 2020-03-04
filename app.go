@@ -28,6 +28,8 @@ type Config struct {
 	TokenSigningKey string
 	MailLogin       string
 	MailPassword    string
+	UploadsPath     string
+	WebRootPath     string
 }
 
 type App struct {
