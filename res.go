@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -19,7 +20,7 @@ type ErrorMsg struct {
 type Response struct {
 	Errors Errs          `json:"errors"`
 	Data   interface{}   `json:"data"`
-	Count  int           `json:"count"`
+	Count  int64         `json:"count"`
 	Req    *http.Request `json:"-"`
 }
 
@@ -51,6 +52,8 @@ func (r *Response) IsJsonParseDone(jsn io.Reader) bool {
 func (r *Response) IsValidate() bool {
 	_, err := govalidator.ValidateStruct(r.Data)
 	if err != nil {
+
+		fmt.Println("VALID ERROR:", err.Error())
 
 		t := strings.Split(err.Error(), ";")
 		for _, v := range t {
