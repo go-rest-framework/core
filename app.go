@@ -1,5 +1,41 @@
 package core
 
+//GO-REST-FRAMEWORK__________________________________________________________________
+//  |  |                                                                             \
+//  |  |                                                                              |--- group helpers to one directory
+//  |  \___ Core--\                                                                   |
+//  |  |           |                                                                  |
+//  |  |           |--- Logs system                                                   |
+//  |  |           |                                                                  |
+//  |  |           |--- New config                                                    |
+//  |  |           |                                                                  |
+//  |  |           |--- i18n                                                          |
+//  |  |
+//  |  \___ User--\
+//  |  |          |
+//  |  |          |--- Oauth2
+//  |  |          |
+//  |  |          |--- User Keyword System (universal type/subtype/role/group tool)
+//  |  |          |      |
+//  |  |          |      |--- admin add list of keywords
+//  |  |          |               creat
+//  |  |          |                   by admin in admin panel
+//  |  |          |               atach
+//  |  |          |                   by admin
+//  |  |          |                   by option from registration
+//  |  |          |                   by special function
+//  |  |          |               check
+//  |  |          |                   by user method
+//  |  |          |                   by endpoint for api
+//  |  |          |
+//  |  |          |--- Profile
+//  |  |          |
+//  |  |
+//  |  \___ System msgs
+//  |
+//  |
+//  \___ Content Element
+
 import (
 	"crypto/sha256"
 	"fmt"
@@ -28,6 +64,8 @@ type Config struct {
 	TokenSigningKey string
 	MailLogin       string
 	MailPassword    string
+	MailServer      string
+	MailPort        string
 	UploadsPath     string
 	WebRootPath     string
 }
@@ -81,6 +119,8 @@ func (a *App) Init() {
 	a.R = mux.NewRouter().StrictSlash(false)
 	a.Mail.Email = a.Config.MailLogin
 	a.Mail.Pass = a.Config.MailPassword
+	a.Mail.Server = a.Config.MailServer
+	a.Mail.Port = a.Config.MailPort
 }
 
 func (a *App) Protect(next func(w http.ResponseWriter, r *http.Request), roles []string) func(w http.ResponseWriter, r *http.Request) {
